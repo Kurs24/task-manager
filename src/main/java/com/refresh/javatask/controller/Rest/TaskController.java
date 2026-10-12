@@ -2,14 +2,19 @@ package com.refresh.javatask.controller.Rest;
 
 import com.refresh.javatask.entity.APIResponse;
 import com.refresh.javatask.entity.Task;
+import com.refresh.javatask.service.TaskService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/tasks")
 public class TaskController {
+
+    private final TaskService taskService;
 
     @PostMapping
     public ResponseEntity<APIResponse<String>> createTask() {
@@ -27,15 +32,12 @@ public class TaskController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
+    @GetMapping("/{id}")
     public ResponseEntity<APIResponse<Task>> getTaskById(@PathVariable Long id) {
-        APIResponse<Task> response = new APIResponse<>();
-        response.setMessage("Task successfully retrieved");
-        response.setData(null);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(taskService.findTaskById(id));
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     public ResponseEntity<APIResponse<Task>> updateTask(@RequestBody Task newTask, @PathVariable Long id) {
         APIResponse<Task> response = new APIResponse<>();
         response.setMessage("Task successfully updated");
@@ -43,7 +45,7 @@ public class TaskController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public ResponseEntity<APIResponse<Task>> deleteTask(@PathVariable Long id) {
         APIResponse<Task> response = new APIResponse<>();
         response.setMessage("Task successfully deleted");
