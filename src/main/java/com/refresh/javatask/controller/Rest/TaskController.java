@@ -24,10 +24,7 @@ public class TaskController {
 
     @GetMapping
     public ResponseEntity<APIResponse<List<Task>>> getTask(@RequestParam Task.Status status) {
-        APIResponse<List<Task>> response = new APIResponse<>();
-        response.setMessage("Task successfully retrieved");
-        response.setData(null);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(taskService.findTaskByStatus(status));
     }
 
     @GetMapping("/{id}")
