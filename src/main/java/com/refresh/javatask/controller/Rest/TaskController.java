@@ -2,6 +2,7 @@ package com.refresh.javatask.controller.Rest;
 
 import com.refresh.javatask.entity.APIResponse;
 import com.refresh.javatask.entity.Task;
+import com.refresh.javatask.requestDTO.CreateTask;
 import com.refresh.javatask.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +18,8 @@ public class TaskController {
     private final TaskService taskService;
 
     @PostMapping
-    public ResponseEntity<APIResponse<String>> createTask() {
-        /* TODO: Implement createTask */
-        APIResponse<String> response = new APIResponse<>();
-        response.setMessage("Task created successfully");
-        return ResponseEntity.ok(response);
+    public ResponseEntity<APIResponse<Task>> createTask(@RequestBody CreateTask task) {
+        return ResponseEntity.ok(taskService.createTask(task));
     }
 
     @GetMapping
