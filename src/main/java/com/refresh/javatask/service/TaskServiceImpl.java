@@ -51,7 +51,19 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task updateTask(Task task) {
+    public APIResponse<Task> updateTask(CreateTask task, Long id) {
+        APIResponse<Task> apiResponse = new APIResponse<>();
+        Task existingTask = taskRepository.findById(id).orElse(null);
+        if (existingTask != null) {
+            existingTask.setTitle(task.getTitle());
+            existingTask.setStatus(task.getStatus());
+            existingTask.setDueDate(task.getDueDate());
+            existingTask.setUpdatedAt(LocalDateTime.now(ZoneId.of("UTC")));
+            taskRepository.save(existingTask);
+            apiResponse.setMessage("Task successfully updated");
+            apiResponse.setData(existingTask);
+            return apiResponse;
+        }
         return null;
     }
 

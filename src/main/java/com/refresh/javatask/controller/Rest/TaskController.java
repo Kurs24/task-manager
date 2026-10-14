@@ -33,11 +33,8 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<APIResponse<Task>> updateTask(@RequestBody Task newTask, @PathVariable Long id) {
-        APIResponse<Task> response = new APIResponse<>();
-        response.setMessage("Task successfully updated");
-        response.setData(null);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<APIResponse<Task>> updateTask(@RequestBody CreateTask updatedTask, @PathVariable Long id) {
+        return ResponseEntity.ok(taskService.updateTask(updatedTask, id));
     }
 
     @DeleteMapping("/{id}")
