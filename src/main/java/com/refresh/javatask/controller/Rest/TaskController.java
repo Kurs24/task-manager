@@ -24,7 +24,7 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<APIResponse<List<Task>>> getTask(@RequestParam Task.Status status) {
+    public ResponseEntity<APIResponse<List<Task>>> getTask(@RequestParam(required = false) Task.Status status) {
         return ResponseEntity.ok(taskService.findTaskByStatus(status));
     }
 

@@ -37,7 +37,11 @@ public class TaskServiceImpl implements TaskService {
     public APIResponse<List<Task>> findTaskByStatus(Task.Status status) {
         APIResponse<List<Task>> apiResponse = new APIResponse<>();
         apiResponse.setMessage("Task successfully retrieved");
-        apiResponse.setData(taskRepository.findByStatus(status));
+        if (status == null) {
+            apiResponse.setData(taskRepository.findAll());
+        } else {
+            apiResponse.setData(taskRepository.findByStatus(status));
+        }
         return apiResponse;
     }
 
