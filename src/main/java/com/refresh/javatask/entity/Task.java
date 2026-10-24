@@ -33,4 +33,7 @@ public class Task {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private  LocalDateTime dueDate;
+
+    @Column(length = 1000)
+    private String description;
 }
