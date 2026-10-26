@@ -43,13 +43,9 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public APIResponse<Task> findTaskById(Long id) {
-        APIResponse<Task> apiResponse = new APIResponse<>();
-        Task task = taskRepository.findById(id)
+    public Task findTaskById(Long id) {
+        return taskRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
-        apiResponse.setMessage("Task successfully retrieved");
-        apiResponse.setData(task);
-        return apiResponse;
     }
 
     @Override

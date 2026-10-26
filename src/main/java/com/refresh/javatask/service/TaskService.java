@@ -9,7 +9,7 @@ import java.util.List;
 public interface TaskService {
     Task createTask(CreateTask task);
     List<Task> findTaskByStatus(Task.Status status);
-    APIResponse<Task> findTaskById(Long id);
+    Task findTaskById(Long id);
     APIResponse<Task> updateTask(CreateTask task, Long id);
     void deleteTask(Long id);
 }
