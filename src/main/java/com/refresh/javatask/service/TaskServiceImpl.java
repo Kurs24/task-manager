@@ -71,15 +71,12 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public APIResponse<Long> deleteTask(Long id) {
+    public void deleteTask(Long id) {
         APIResponse<Long> apiResponse = new APIResponse<>();
         boolean isTaskExists = taskRepository.existsById(id);
         if (!isTaskExists) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found");
         }
         taskRepository.deleteById(id);
-        apiResponse.setMessage("Task successfully deleted");
-        apiResponse.setData(id);
-        return apiResponse;
     }
 }

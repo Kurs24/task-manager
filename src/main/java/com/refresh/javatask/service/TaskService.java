@@ -11,5 +11,5 @@ public interface TaskService {
     APIResponse<List<Task>> findTaskByStatus(Task.Status status);
     APIResponse<Task> findTaskById(Long id);
     APIResponse<Task> updateTask(CreateTask task, Long id);
-    APIResponse<Long> deleteTask(Long id);
+    void deleteTask(Long id);
 }
