@@ -1,6 +1,6 @@
 package com.refresh.javatask.service;
 
-import com.refresh.javatask.entity.APIResponse;
+import com.refresh.javatask.ResponseDTO.APIResponse;
 import com.refresh.javatask.entity.Task;
 import com.refresh.javatask.repository.TaskRepository;
 import com.refresh.javatask.requestDTO.CreateTask;
@@ -20,8 +20,7 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
 
     @Override
-    public APIResponse<Task> createTask(CreateTask task) {
-        APIResponse<Task> apiResponse = new APIResponse<>();
+    public Task createTask(CreateTask task) {
         Task newTask = Task.builder()
                 .title(task.getTitle())
                 .status(task.getStatus())
@@ -30,9 +29,7 @@ public class TaskServiceImpl implements TaskService {
                 .updatedAt(LocalDateTime.now(ZoneId.of("UTC")))
                 .build();
         taskRepository.save(newTask);
-        apiResponse.setMessage("Task successfully created");
-        apiResponse.setData(newTask);
-        return apiResponse;
+        return newTask;
     }
 
     @Override

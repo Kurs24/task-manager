@@ -1,6 +1,6 @@
 package com.refresh.javatask.controller.Rest;
 
-import com.refresh.javatask.entity.APIResponse;
+import com.refresh.javatask.ResponseDTO.APIResponse;
 import com.refresh.javatask.entity.Task;
 import com.refresh.javatask.requestDTO.CreateTask;
 import com.refresh.javatask.service.TaskService;
@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -20,7 +21,10 @@ public class TaskController {
 
     @PostMapping
     public ResponseEntity<APIResponse<Task>> createTask(@Valid @RequestBody CreateTask task) {
-        return ResponseEntity.ok(taskService.createTask(task));
+        Task created = taskService.createTask(task);
+        URI location = URI.create("/api/tasks/" + created.getId());
+        return ResponseEntity.created(location)
+                .body(APIResponse.of(created, "Task successfully created"));
     }
 
     @GetMapping
@@ -34,7 +38,8 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<APIResponse<Task>> updateTask(@Valid @RequestBody CreateTask updatedTask, @PathVariable Long id) {
+    public ResponseEntity<APIResponse<Task>> updateTask(@Valid @RequestBody CreateTask updatedTask,
+                                                        @PathVariable Long id) {
         return ResponseEntity.ok(taskService.updateTask(updatedTask, id));
     }
 
