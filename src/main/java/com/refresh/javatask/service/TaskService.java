@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface TaskService {
     Task createTask(CreateTask task);
-    APIResponse<List<Task>> findTaskByStatus(Task.Status status);
+    List<Task> findTaskByStatus(Task.Status status);
     APIResponse<Task> findTaskById(Long id);
     APIResponse<Task> updateTask(CreateTask task, Long id);
     void deleteTask(Long id);
