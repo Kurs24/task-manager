@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 public class CreateTask {
 
     @NotBlank(message = "Title is required")
+    @Size(max = 255)
     private String title;
 
     @NotNull(message = "Status is required")
