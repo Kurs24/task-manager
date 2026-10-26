@@ -42,7 +42,8 @@ public class TaskController {
     @PutMapping("/{id}")
     public ResponseEntity<APIResponse<Task>> updateTask(@Valid @RequestBody CreateTask updatedTask,
                                                         @PathVariable Long id) {
-        return ResponseEntity.ok(taskService.updateTask(updatedTask, id));
+        Task updated = taskService.updateTask(updatedTask, id);
+        return ResponseEntity.ok(APIResponse.of(updated, "Task successfully updated"));
     }
 
     @DeleteMapping("/{id}")

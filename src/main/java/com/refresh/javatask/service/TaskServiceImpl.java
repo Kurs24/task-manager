@@ -49,24 +49,18 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public APIResponse<Task> updateTask(CreateTask task, Long id) {
-        APIResponse<Task> apiResponse = new APIResponse<>();
+    public Task updateTask(CreateTask task, Long id) {
         Task existingTask = taskRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
         existingTask.setTitle(task.getTitle());
         existingTask.setStatus(task.getStatus());
         existingTask.setDueDate(task.getDueDate());
         existingTask.setUpdatedAt(LocalDateTime.now(ZoneId.of("UTC")));
-        taskRepository.save(existingTask);
-        apiResponse.setMessage("Task successfully updated");
-        apiResponse.setData(existingTask);
-        return apiResponse;
-
+        return taskRepository.save(existingTask);
     }
 
     @Override
     public void deleteTask(Long id) {
-        APIResponse<Long> apiResponse = new APIResponse<>();
         boolean isTaskExists = taskRepository.existsById(id);
         if (!isTaskExists) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found");

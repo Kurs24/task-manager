@@ -10,6 +10,6 @@ public interface TaskService {
     Task createTask(CreateTask task);
     List<Task> findTaskByStatus(Task.Status status);
     Task findTaskById(Long id);
-    APIResponse<Task> updateTask(CreateTask task, Long id);
+    Task updateTask(CreateTask task, Long id);
     void deleteTask(Long id);
 }
