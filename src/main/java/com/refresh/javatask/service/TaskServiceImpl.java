@@ -5,7 +5,9 @@ import com.refresh.javatask.entity.Task;
 import com.refresh.javatask.repository.TaskRepository;
 import com.refresh.javatask.requestDTO.CreateTask;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -48,7 +50,8 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public APIResponse<Task> findTaskById(Long id) {
         APIResponse<Task> apiResponse = new APIResponse<>();
-        Task task = taskRepository.findById(id).orElse(null);
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
         apiResponse.setMessage("Task successfully retrieved");
         apiResponse.setData(task);
         return apiResponse;
@@ -57,18 +60,17 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public APIResponse<Task> updateTask(CreateTask task, Long id) {
         APIResponse<Task> apiResponse = new APIResponse<>();
-        Task existingTask = taskRepository.findById(id).orElse(null);
-        if (existingTask != null) {
-            existingTask.setTitle(task.getTitle());
-            existingTask.setStatus(task.getStatus());
-            existingTask.setDueDate(task.getDueDate());
-            existingTask.setUpdatedAt(LocalDateTime.now(ZoneId.of("UTC")));
-            taskRepository.save(existingTask);
-            apiResponse.setMessage("Task successfully updated");
-            apiResponse.setData(existingTask);
-            return apiResponse;
-        }
-        return null;
+        Task existingTask = taskRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
+        existingTask.setTitle(task.getTitle());
+        existingTask.setStatus(task.getStatus());
+        existingTask.setDueDate(task.getDueDate());
+        existingTask.setUpdatedAt(LocalDateTime.now(ZoneId.of("UTC")));
+        taskRepository.save(existingTask);
+        apiResponse.setMessage("Task successfully updated");
+        apiResponse.setData(existingTask);
+        return apiResponse;
+
     }
 
     @Override
