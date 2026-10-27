@@ -25,8 +25,6 @@ public class TaskServiceImpl implements TaskService {
                 .title(task.getTitle())
                 .status(task.getStatus())
                 .dueDate(task.getDueDate())
-                .createdAt(LocalDateTime.now(ZoneId.of("UTC")))
-                .updatedAt(LocalDateTime.now(ZoneId.of("UTC")))
                 .build();
         taskRepository.save(newTask);
         return newTask;
@@ -55,7 +53,6 @@ public class TaskServiceImpl implements TaskService {
         existingTask.setTitle(task.getTitle());
         existingTask.setStatus(task.getStatus());
         existingTask.setDueDate(task.getDueDate());
-        existingTask.setUpdatedAt(LocalDateTime.now(ZoneId.of("UTC")));
         return taskRepository.save(existingTask);
     }
 

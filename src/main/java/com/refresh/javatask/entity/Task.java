@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity
 @Setter
@@ -23,7 +24,7 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String title;
 
     @Enumerated(EnumType.STRING)
@@ -36,4 +37,16 @@ public class Task {
 
     @Column(length = 1000)
     private String description;
+
+    @PrePersist
+    private void onCreate() {
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("UTC"));
+        createdAt = now;
+        updatedAt = now;
+    }
+
+    @PreUpdate
+    private void onUpdate() {
+        updatedAt = LocalDateTime.now(ZoneId.of("UTC"));
+    }
 }
