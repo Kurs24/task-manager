@@ -1,25 +1,25 @@
 package com.refresh.javatask.service;
 
-import com.refresh.javatask.ResponseDTO.APIResponse;
 import com.refresh.javatask.entity.Task;
 import com.refresh.javatask.repository.TaskRepository;
 import com.refresh.javatask.requestDTO.CreateTask;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
 
     @Override
+    @Transactional
     public Task createTask(CreateTask task) {
         Task newTask = Task.builder()
                 .title(task.getTitle())
@@ -47,6 +47,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
     public Task updateTask(CreateTask task, Long id) {
         Task existingTask = taskRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
@@ -57,6 +58,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
     public void deleteTask(Long id) {
         boolean isTaskExists = taskRepository.existsById(id);
         if (!isTaskExists) {
