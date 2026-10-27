@@ -1,4 +1,4 @@
-package com.refresh.javatask.ResponseDTO;
+package com.refresh.javatask.responsedto;
 
 import lombok.Getter;
 import lombok.Setter;

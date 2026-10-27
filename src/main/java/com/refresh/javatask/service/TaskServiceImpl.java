@@ -2,7 +2,7 @@ package com.refresh.javatask.service;
 
 import com.refresh.javatask.entity.Task;
 import com.refresh.javatask.repository.TaskRepository;
-import com.refresh.javatask.requestDTO.TaskRequest;
+import com.refresh.javatask.requestdto.TaskRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

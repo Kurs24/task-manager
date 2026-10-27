@@ -1,4 +1,4 @@
-package com.refresh.javatask.requestDTO;
+package com.refresh.javatask.requestdto;
 
 import com.refresh.javatask.entity.Task;
 import jakarta.validation.constraints.NotBlank;

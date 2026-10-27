@@ -1,8 +1,8 @@
-package com.refresh.javatask.controller.Rest;
+package com.refresh.javatask.controller;
 
-import com.refresh.javatask.ResponseDTO.APIResponse;
+import com.refresh.javatask.responsedto.APIResponse;
 import com.refresh.javatask.entity.Task;
-import com.refresh.javatask.requestDTO.TaskRequest;
+import com.refresh.javatask.requestdto.TaskRequest;
 import com.refresh.javatask.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
