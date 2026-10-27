@@ -28,7 +28,7 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<APIResponse<List<Task>>> getTask(@RequestParam(required = false) Task.Status status) {
+    public ResponseEntity<APIResponse<List<Task>>> getTasks(@RequestParam(required = false) Task.Status status) {
         List<Task> taskLists = taskService.findTaskByStatus(status);
         return ResponseEntity.ok().body(APIResponse.of(taskLists, "Task successfully found"));
     }
