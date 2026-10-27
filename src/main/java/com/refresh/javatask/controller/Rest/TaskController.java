@@ -2,7 +2,7 @@ package com.refresh.javatask.controller.Rest;
 
 import com.refresh.javatask.ResponseDTO.APIResponse;
 import com.refresh.javatask.entity.Task;
-import com.refresh.javatask.requestDTO.CreateTask;
+import com.refresh.javatask.requestDTO.TaskRequest;
 import com.refresh.javatask.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +20,8 @@ public class TaskController {
     private final TaskService taskService;
 
     @PostMapping
-    public ResponseEntity<APIResponse<Task>> createTask(@Valid @RequestBody CreateTask task) {
-        Task created = taskService.createTask(task);
+    public ResponseEntity<APIResponse<Task>> createTask(@Valid @RequestBody TaskRequest request) {
+        Task created = taskService.createTask(request);
         URI location = URI.create("/api/tasks/" + created.getId());
         return ResponseEntity.created(location)
                 .body(APIResponse.of(created, "Task successfully created"));
@@ -40,9 +40,9 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<APIResponse<Task>> updateTask(@Valid @RequestBody CreateTask updatedTask,
+    public ResponseEntity<APIResponse<Task>> updateTask(@Valid @RequestBody TaskRequest request,
                                                         @PathVariable Long id) {
-        Task updated = taskService.updateTask(updatedTask, id);
+        Task updated = taskService.updateTask(request, id);
         return ResponseEntity.ok(APIResponse.of(updated, "Task successfully updated"));
     }
 

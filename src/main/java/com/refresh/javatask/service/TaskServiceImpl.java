@@ -2,7 +2,7 @@ package com.refresh.javatask.service;
 
 import com.refresh.javatask.entity.Task;
 import com.refresh.javatask.repository.TaskRepository;
-import com.refresh.javatask.requestDTO.CreateTask;
+import com.refresh.javatask.requestDTO.TaskRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -20,14 +20,13 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
-    public Task createTask(CreateTask task) {
+    public Task createTask(TaskRequest task) {
         Task newTask = Task.builder()
                 .title(task.getTitle())
                 .status(task.getStatus())
                 .dueDate(task.getDueDate())
                 .build();
-        taskRepository.save(newTask);
-        return newTask;
+        return taskRepository.save(newTask);
     }
 
     @Override
@@ -48,7 +47,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
-    public Task updateTask(CreateTask task, Long id) {
+    public Task updateTask(TaskRequest task, Long id) {
         Task existingTask = taskRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
         existingTask.setTitle(task.getTitle());
