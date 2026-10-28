@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 
 @Entity
@@ -32,9 +31,13 @@ public class Task {
     @Column(nullable = false)
     private Status status;
 
-    @Column(updatable = false)
+    @Column(updatable = false, name = "created_at")
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "due_date")
     private LocalDateTime dueDate;
 
     @Column(length = 1000)
