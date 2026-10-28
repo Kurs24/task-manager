@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
@@ -22,15 +23,16 @@ public class TaskController {
     @PostMapping
     public ResponseEntity<APIResponse<Task>> createTask(@Valid @RequestBody TaskRequest request) {
         Task created = taskService.createTask(request);
-        URI location = URI.create("/api/tasks/" + created.getId());
+        URI location =
+                ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(created.getId()).toUri();
         return ResponseEntity.created(location)
                 .body(APIResponse.of(created, "Task successfully created"));
     }
 
     @GetMapping
     public ResponseEntity<APIResponse<List<Task>>> getTasks(@RequestParam(required = false) Task.Status status) {
-        List<Task> taskLists = taskService.findTaskByStatus(status);
-        return ResponseEntity.ok().body(APIResponse.of(taskLists, "Task successfully found"));
+        List<Task> taskLists = taskService.findTasks(status);
+        return ResponseEntity.ok().body(APIResponse.of(taskLists, "Tasks successfully retrieved"));
     }
 
     @GetMapping("/{id}")

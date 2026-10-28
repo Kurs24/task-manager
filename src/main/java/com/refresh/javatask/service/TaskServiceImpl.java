@@ -31,7 +31,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> findTaskByStatus(Task.Status status) {
+    public List<Task> findTasks(Task.Status status) {
         if (status == null) {
             return taskRepository.findAll();
         } else {
