@@ -29,7 +29,6 @@ src/main/java/com/refresh/javatask/
 │   └── TaskController.java           # REST API endpoints
 ├── entity/
 │   ├── Task.java                     # Task entity with JPA annotations
-│   └── APIResponse.java              # Standardized API response wrapper
 ├── repository/
 │   └── TaskRepository.java           # JPA repository interface
 ├── requestdto/
@@ -54,33 +53,20 @@ Before running this project, ensure you have the following installed:
 ### 1. Clone the Repository
 ```bash
 git clone https://github.com/Kurs24/task-manager.git
-cd cd task-manager
+cd task-manager
 ```
 
-### 2. Configure Database
-
-Create a PostgreSQL database for the application:
-```sql
-CREATE DATABASE javatask;
+### 2. Create the Database
+```bash
+psql -U postgres -c "CREATE DATABASE taskmanager;"
 ```
 
-### 3. Set Environment Variables
-
-Create a `.env` file in the project root directry and copy this line of code
+### 3. Configure Environment Variables
 ```bash
 cp .env.example .env
 ```
-
-### 4. Update Database Configuration
-
-The database configuration is in `src/main/resources/application.properties`:
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/${DB_DATABASE}
-spring.datasource.username=${DB_USER}
-spring.datasource.password=${DB_PASSWORD}
-```
-
-Ensure PostgreSQL is running on `localhost:5432` or update the URL accordingly.
+Open `.env` and set `DB_PASSWORD` (and the other values if your PostgreSQL setup differs).
+The application reads `.env` from the working directory, so always run it from the project root.
 
 ## Running the Project
 **Please make sure that you are running the application from the root directory and you run 
@@ -247,13 +233,7 @@ Base URL: `http://localhost:8080/api/tasks`
 ### Delete Task
 - **Method**: `DELETE`
 - **Endpoint**: `/api/tasks/{id}`
-- **Response**:
-  ```json
-  {
-    "message": "Task successfully deleted",
-    "data": 1
-  }
-  ```
+- **Response**: `204 No Content` (empty body), or `404` if the task does not exist
 
 ## Task Status Values
 
@@ -263,26 +243,29 @@ Base URL: `http://localhost:8080/api/tasks`
 
 ## Database Schema
 
-The application uses JPA with `ddl-auto=create-drop`, which means:
-- Tables are automatically created on application startup
-- Tables are dropped when the application shuts down
+Hibernate manages the schema with `ddl-auto=update` during early development.
+Data is persisted and survives application restarts. From Milestone 3, schema changes
+will be managed with Flyway migrations.
 
-**Task Table Structure**:
-- `id` (Long, Primary Key, Auto-generated)
-- `title` (String)
-- `status` (Enum: TODO, IN_PROGRESS, DONE)
-- `dueDate` (LocalDateTime)
-- `createdAt` (LocalDateTime)
-- `updatedAt` (LocalDateTime)
-- `description` (String)
+**Table `task`**
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | bigint | Primary key, auto-generated |
+| `title` | varchar(255) | Required |
+| `description` | varchar(1000) | Optional |
+| `status` | varchar | Required. `TODO`, `IN_PROGRESS`, `DONE` (stored as text) |
+| `due_date` | timestamp | Optional |
+| `created_at` | timestamp | Set automatically |
+| `updated_at` | timestamp | Updated automatically |
 
 ## Testing
 
-This Scope will be provided in next scope
-
-Run tests using Maven:
+Unit tests will be added in Milestone 2. Currently the project only contains the default
+`contextLoads` test, which starts the full application context and therefore **requires a running
+PostgreSQL**. To build without running tests:
 ```bash
-mvn test
+mvn clean package -DskipTests
 ```
 
 ## Quick Test
