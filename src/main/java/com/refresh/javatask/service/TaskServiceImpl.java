@@ -43,14 +43,14 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Task findTaskById(Long id) {
         return taskRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, notFoundMessage(id)));
     }
 
     @Override
     @Transactional
     public Task updateTask(TaskRequest task, Long id) {
         Task existingTask = taskRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, notFoundMessage(id)));
         existingTask.setTitle(task.getTitle());
         existingTask.setStatus(task.getStatus());
         existingTask.setDueDate(task.getDueDate());
@@ -63,8 +63,12 @@ public class TaskServiceImpl implements TaskService {
     public void deleteTask(Long id) {
         boolean isTaskExists = taskRepository.existsById(id);
         if (!isTaskExists) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, notFoundMessage(id));
         }
         taskRepository.deleteById(id);
+    }
+
+    private String notFoundMessage(Long id) {
+        return "Task with id " + id + " not found";
     }
 }
