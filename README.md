@@ -83,7 +83,9 @@ spring.datasource.password=${DB_PASSWORD}
 Ensure PostgreSQL is running on `localhost:5432` or update the URL accordingly.
 
 ## Running the Project
-**Please make sure that you are running the application from the root directory.**
+**Please make sure that you are running the application from the root directory and you run 
+the postgreSQL server before building this apps.
+.**
 ### Using Maven
 
 1. **Build the project**:
