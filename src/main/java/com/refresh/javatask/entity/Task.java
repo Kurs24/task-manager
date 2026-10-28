@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 
 @Entity
 @Setter
@@ -31,22 +32,23 @@ public class Task {
     @Column(nullable = false)
     private Status status;
 
+    @Column(updatable = false)
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private  LocalDateTime dueDate;
+    private LocalDateTime dueDate;
 
     @Column(length = 1000)
     private String description;
 
     @PrePersist
     private void onCreate() {
-        LocalDateTime now = LocalDateTime.now(ZoneId.of("UTC"));
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         createdAt = now;
         updatedAt = now;
     }
 
     @PreUpdate
     private void onUpdate() {
-        updatedAt = LocalDateTime.now(ZoneId.of("UTC"));
+        updatedAt = LocalDateTime.now(ZoneOffset.UTC);
     }
 }
