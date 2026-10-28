@@ -25,6 +25,7 @@ public class TaskServiceImpl implements TaskService {
                 .title(task.getTitle())
                 .status(task.getStatus())
                 .dueDate(task.getDueDate())
+                .description(task.getDescription())
                 .build();
         return taskRepository.save(newTask);
     }
@@ -53,6 +54,7 @@ public class TaskServiceImpl implements TaskService {
         existingTask.setTitle(task.getTitle());
         existingTask.setStatus(task.getStatus());
         existingTask.setDueDate(task.getDueDate());
+        existingTask.setDescription(task.getDescription());
         return taskRepository.save(existingTask);
     }
 
