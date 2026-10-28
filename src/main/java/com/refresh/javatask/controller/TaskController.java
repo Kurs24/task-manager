@@ -38,7 +38,7 @@ public class TaskController {
     @GetMapping("/{id}")
     public ResponseEntity<APIResponse<Task>> getTaskById(@PathVariable Long id) {
         Task foundTask = taskService.findTaskById(id);
-        return ResponseEntity.ok().body(APIResponse.of(foundTask, "Task successfully found"));
+        return ResponseEntity.ok().body(APIResponse.of(foundTask, "Task successfully retrieved"));
     }
 
     @PutMapping("/{id}")
