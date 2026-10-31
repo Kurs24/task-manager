@@ -4,10 +4,10 @@ import com.refresh.javatask.exception.BusinessRuleException;
 import com.refresh.javatask.exception.ResourceNotFoundException;
 import com.refresh.javatask.responsedto.APIError;
 import com.refresh.javatask.responsedto.FieldViolation;
-import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -43,10 +43,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-                                                                  @Nullable HttpHeaders headers,
-                                                                  @NonNull HttpStatusCode status,
-                                                                  @NonNull WebRequest request) {
+    protected @NonNull ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+                                                                           @NonNull HttpHeaders headers,
+                                                                           @NonNull HttpStatusCode status,
+                                                                           @NonNull WebRequest request) {
         log.warn("Method argument not valid: {}", ex.getMessage());
         return buildResponse(status, "Validation Error", getUrlPath(request),
                 ex.getBindingResult().getFieldErrors().stream()
@@ -55,7 +55,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
-                                                                  @Nullable HttpHeaders headers,
+                                                                  @NonNull HttpHeaders headers,
                                                                   @NonNull HttpStatusCode status,
                                                                   @NonNull WebRequest request) {
         log.warn("Http message not readable: {}", ex.getMessage());
@@ -64,7 +64,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, @Nullable HttpHeaders headers,
+    protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, @NonNull HttpHeaders headers,
                                                         @NonNull HttpStatusCode status, @NonNull WebRequest request) {
         log.warn("Type mismatch: {}", ex.getMessage());
         return buildResponse(status, "Type mismatch for Parameter '" + ex.getPropertyName() + "'",
