@@ -48,7 +48,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   @NonNull HttpStatusCode status,
                                                                   @NonNull WebRequest request) {
         log.warn("Method argument not valid: {}", ex.getMessage());
-        return buildResponse(status, "Validation Error!", getUrlPath(request),
+        return buildResponse(status, "Validation Error", getUrlPath(request),
                 ex.getBindingResult().getFieldErrors().stream()
                         .map(errs -> new FieldViolation(errs.getField(), errs.getDefaultMessage())).toList());
     }
@@ -59,7 +59,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   @NonNull HttpStatusCode status,
                                                                   @NonNull WebRequest request) {
         log.warn("Http message not readable: {}", ex.getMessage());
-        return buildResponse(status, "JSON or Message not readable!",
+        return buildResponse(status, "Invalid JSON or field value",
                 getUrlPath(request), null);
     }
 
@@ -67,7 +67,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, @Nullable HttpHeaders headers,
                                                         @NonNull HttpStatusCode status, @NonNull WebRequest request) {
         log.warn("Type mismatch: {}", ex.getMessage());
-        return buildResponse(status, "Type mismatch for Parameter " + ex.getPropertyName() + "!",
+        return buildResponse(status, "Type mismatch for Parameter '" + ex.getPropertyName() + "'",
                 getUrlPath(request), null);
     }
 
