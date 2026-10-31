@@ -1,14 +1,16 @@
 package com.refresh.javatask.service;
 
 import com.refresh.javatask.entity.Task;
+import com.refresh.javatask.exception.BusinessRuleException;
+import com.refresh.javatask.exception.ResourceNotFoundException;
 import com.refresh.javatask.repository.TaskRepository;
 import com.refresh.javatask.requestdto.TaskRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @Service
@@ -21,12 +23,11 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional
     public Task createTask(TaskRequest task) {
-        Task newTask = Task.builder()
-                .title(task.getTitle())
-                .status(task.getStatus())
-                .dueDate(task.getDueDate())
-                .description(task.getDescription())
-                .build();
+        if (task.getDueDate() != null && task.getDueDate().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
+            throw new BusinessRuleException("Due date cannot be in the past");
+        }
+        Task newTask = Task.builder().title(task.getTitle()).status(task.getStatus()).dueDate(task.getDueDate())
+                .description(task.getDescription()).build();
         return taskRepository.save(newTask);
     }
 
@@ -42,15 +43,14 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Task findTaskById(Long id) {
-        return taskRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, notFoundMessage(id)));
+        return taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task", id));
     }
 
     @Override
     @Transactional
     public Task updateTask(TaskRequest task, Long id) {
         Task existingTask = taskRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, notFoundMessage(id)));
+                .orElseThrow(() -> new ResourceNotFoundException("Task", id));
         existingTask.setTitle(task.getTitle());
         existingTask.setStatus(task.getStatus());
         existingTask.setDueDate(task.getDueDate());
@@ -63,12 +63,8 @@ public class TaskServiceImpl implements TaskService {
     public void deleteTask(Long id) {
         boolean isTaskExists = taskRepository.existsById(id);
         if (!isTaskExists) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, notFoundMessage(id));
+            throw new ResourceNotFoundException("Task", id);
         }
         taskRepository.deleteById(id);
-    }
-
-    private String notFoundMessage(Long id) {
-        return "Task with id " + id + " not found";
     }
 }
