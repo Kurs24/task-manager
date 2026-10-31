@@ -47,7 +47,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                                            @NonNull HttpHeaders headers,
                                                                            @NonNull HttpStatusCode status,
                                                                            @NonNull WebRequest request) {
-        log.warn("Method argument not valid: {}", ex.getMessage());
+        log.warn("Method argument not valid: {} {}", getUrlPath(request),
+                ex.getBindingResult().getFieldErrors().stream()
+                        .map(errs -> new FieldViolation(errs.getField(), errs.getDefaultMessage())).toList());
         return buildResponse(status, "Validation Error", getUrlPath(request),
                 ex.getBindingResult().getFieldErrors().stream()
                         .map(errs -> new FieldViolation(errs.getField(), errs.getDefaultMessage())).toList());
