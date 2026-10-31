@@ -78,9 +78,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                              @NonNull WebRequest request) {
         log.warn("Error: {}", ex.getMessage());
         String errDetail = (ex instanceof org.springframework.web.ErrorResponse er) ? er.getBody().getDetail() : null;
+
+        HttpStatus resolved = HttpStatus.resolve(statusCode.value());
+        String errorString = (resolved != null) ? resolved.getReasonPhrase() : "Unknown";
+
         return ResponseEntity.status(statusCode).headers(headers).body(
                 new APIError(Instant.now(), statusCode.value(),
-                        HttpStatus.valueOf(statusCode.value()).getReasonPhrase(),
+                        errorString,
                         errDetail != null ? errDetail : "Request Error", getUrlPath(request), null)
         );
     }
@@ -94,8 +98,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private ResponseEntity<Object> buildResponse(HttpStatusCode code, String message, String path,
                                                  List<FieldViolation> errors) {
+
+        HttpStatus resolved = HttpStatus.resolve(code.value());
+        String errorString = (resolved != null) ? resolved.getReasonPhrase() : "Unknown";
+
         APIError err =
-                new APIError(Instant.now(), code.value(), HttpStatus.valueOf(code.value()).getReasonPhrase(), message,
+                new APIError(Instant.now(), code.value(), errorString, message,
                         path, errors);
         return ResponseEntity.status(code).body(err);
     }
