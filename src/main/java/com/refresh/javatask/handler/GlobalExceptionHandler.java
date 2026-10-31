@@ -36,7 +36,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(BusinessRuleException.class)
-    public ResponseEntity<Object> handleResourceNotFoundException(BusinessRuleException ex, HttpServletRequest request) {
+    public ResponseEntity<Object> handleResourceNotFoundException(BusinessRuleException ex,
+                                                                  HttpServletRequest request) {
         log.warn("Business rule violation: {}", ex.getMessage());
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request.getRequestURI(), null);
     }
@@ -47,7 +48,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   @NonNull HttpStatusCode status,
                                                                   @NonNull WebRequest request) {
         log.warn("Method argument not valid: {}", ex.getMessage());
-        return buildResponse(status, "Validation Error!", ((ServletWebRequest) request).getRequest().getRequestURI(),
+        return buildResponse(status, "Validation Error!", getUrlPath(request),
                 ex.getBindingResult().getFieldErrors().stream()
                         .map(errs -> new FieldViolation(errs.getField(), errs.getDefaultMessage())).toList());
     }
@@ -59,7 +60,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   @NonNull WebRequest request) {
         log.warn("Http message not readable: {}", ex.getMessage());
         return buildResponse(status, "JSON or Message not readable!",
-                ((ServletWebRequest) request).getRequest().getRequestURI(), null);
+                getUrlPath(request), null);
     }
 
     @Override
@@ -67,7 +68,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                         @NonNull HttpStatusCode status, @NonNull WebRequest request) {
         log.warn("Type mismatch: {}", ex.getMessage());
         return buildResponse(status, "Type mismatch for Parameter " + ex.getPropertyName() + "!",
-                ((ServletWebRequest) request).getRequest().getRequestURI(), null);
+                getUrlPath(request), null);
     }
 
     @Override
@@ -88,7 +89,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleOther(Exception ex, WebRequest request) {
         log.error("Internal Server Error: ", ex);
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error",
-                ((ServletWebRequest) request).getRequest().getRequestURI(), null);
+                getUrlPath(request), null);
     }
 
     private ResponseEntity<Object> buildResponse(HttpStatusCode code, String detail, String location,
