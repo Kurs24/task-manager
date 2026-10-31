@@ -92,11 +92,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 getUrlPath(request), null);
     }
 
-    private ResponseEntity<Object> buildResponse(HttpStatusCode code, String detail, String location,
+    private ResponseEntity<Object> buildResponse(HttpStatusCode code, String message, String path,
                                                  List<FieldViolation> errors) {
         APIError err =
-                new APIError(Instant.now(), code.value(), HttpStatus.valueOf(code.value()).getReasonPhrase(), detail,
-                        location, errors);
+                new APIError(Instant.now(), code.value(), HttpStatus.valueOf(code.value()).getReasonPhrase(), message,
+                        path, errors);
         return ResponseEntity.status(code).body(err);
     }
 
