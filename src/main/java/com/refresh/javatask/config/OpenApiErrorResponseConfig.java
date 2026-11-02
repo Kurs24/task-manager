@@ -4,6 +4,7 @@ import com.refresh.javatask.responsedto.APIError;
 import io.swagger.v3.core.converter.AnnotatedType;
 import io.swagger.v3.core.converter.ModelConverters;
 import io.swagger.v3.core.converter.ResolvedSchema;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
@@ -31,6 +32,9 @@ public class OpenApiErrorResponseConfig {
                 ModelConverters.getInstance().resolveAsResolvedSchema(new AnnotatedType(APIError.class));
 
         return openApi -> {
+            if (openApi.getComponents() == null) {
+                openApi.setComponents(new Components());
+            }
             errSchema.referencedSchemas.forEach(openApi.getComponents()::addSchemas);
             openApi.getPaths()
                     .forEach((path, item) -> item.readOperations().forEach(operation -> {
@@ -64,7 +68,10 @@ public class OpenApiErrorResponseConfig {
         errorsExample.put("message", message);
         errorsExample.put("path", path);
         if (withViolations) {
-            errorsExample.put("fieldViolations", List.of(Map.of("field", "title", "message", "Title is required")));
+            Map<String, String> violations = new LinkedHashMap<>();
+            violations.put("field", "title");
+            violations.put("message", "Title is required");
+            errorsExample.put("fieldViolations", violations);
         }
         return new Content().addMediaType("application/json",
                 new MediaType().schema(new Schema<>().$ref("#/components/schemas/APIError")).example(errorsExample));
