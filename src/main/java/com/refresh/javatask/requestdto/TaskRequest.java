@@ -16,7 +16,7 @@ public class TaskRequest {
     @NotBlank(message = "Title is required")
     @Size(max = 255)
     @Schema(description = "Title of the task, must be at most 255 characters",
-            requiredMode = Schema.RequiredMode.REQUIRED, example = "Example Task")
+            requiredMode = Schema.RequiredMode.REQUIRED, example = "Example Task", minLength = 1)
     private String title;
 
     @NotNull(message = "Status is required")
