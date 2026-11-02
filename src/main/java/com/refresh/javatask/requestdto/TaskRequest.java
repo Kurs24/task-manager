@@ -20,7 +20,7 @@ public class TaskRequest {
     private String title;
 
     @NotNull(message = "Status is required")
-    @Schema(name = "TaskStatus", description = "Status of the task", requiredMode = Schema.RequiredMode.REQUIRED,
+    @Schema(description = "Status of the task", requiredMode = Schema.RequiredMode.REQUIRED,
             example = "TODO")
     private Task.Status status;
 
