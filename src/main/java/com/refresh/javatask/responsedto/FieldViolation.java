@@ -1,4 +1,12 @@
 package com.refresh.javatask.responsedto;
 
-public record FieldViolation(String field, String message) {
+import io.swagger.v3.oas.annotations.media.Schema;
+
+public record FieldViolation(
+        @Schema(description = "Field name that caused the error", example = "title")
+        String field,
+
+        @Schema(description = "Error message", example = "Title is required")
+        String message
+) {
 }

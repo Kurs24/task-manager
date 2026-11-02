@@ -14,19 +14,20 @@ import java.time.LocalDateTime;
 public class TaskRequest {
 
     @NotBlank(message = "Title is required")
-    @Size(max = 255, min = 1)
-    @Schema(description = "Title of the task, must be less than 255 characters",
+    @Size(max = 255)
+    @Schema(description = "Title of the task, must be at most 255 characters",
             requiredMode = Schema.RequiredMode.REQUIRED, example = "Example Task")
     private String title;
 
     @NotNull(message = "Status is required")
-    @Schema(description = "Status of the task", requiredMode = Schema.RequiredMode.REQUIRED, example = "TODO")
+    @Schema(name = "TaskStatus", description = "Status of the task", requiredMode = Schema.RequiredMode.REQUIRED,
+            example = "TODO")
     private Task.Status status;
 
-    @Schema(description = "Due date of the task, must be in the future", example = "2023-01-01T00:00:00")
+    @Schema(description = "Due date of the task, must not be in the past", example = "2030-12-31T23:59:59")
     private LocalDateTime dueDate;
 
-    @Size(max = 1000, message = "Description must be less than 1000 characters")
-    @Schema(description = "Description of the task, must be less than 1000 characters", example = "Example Description")
+    @Size(max = 1000, message = "Description must be at most 1000 characters")
+    @Schema(description = "Description of the task, must be at most 1000 characters", example = "Example Description")
     private String description;
 }
