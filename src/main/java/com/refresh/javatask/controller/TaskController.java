@@ -20,7 +20,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/tasks")
+@RequestMapping(path = "/api/tasks", produces = "application/json")
 @Tag(name = "task", description = "all task related operations")
 public class TaskController {
 
