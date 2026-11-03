@@ -57,13 +57,13 @@ public class TaskController {
                     )
             }
     )
-    public ResponseEntity<APIResponse<List<Task>>> getTasks(
+    public ResponseEntity<APIResponse<List<TaskResponse>>> getTasks(
             @Parameter(
                     description = "Status of the task",
                     in = ParameterIn.QUERY
 
             ) @RequestParam(required = false) Task.Status status) {
-        List<Task> taskLists = taskService.findTasks(status);
+        List<TaskResponse> taskLists = taskService.findTasks(status);
         return ResponseEntity.ok().body(APIResponse.of(taskLists, "Tasks successfully retrieved"));
     }
 

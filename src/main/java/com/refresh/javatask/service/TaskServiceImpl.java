@@ -34,11 +34,11 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> findTasks(Task.Status status) {
+    public List<TaskResponse> findTasks(Task.Status status) {
         if (status == null) {
-            return taskRepository.findAll();
+            return taskRepository.findAll().stream().map(TaskMapper::toTaskResponse).toList();
         } else {
-            return taskRepository.findByStatus(status);
+            return taskRepository.findByStatus(status).stream().map(TaskMapper::toTaskResponse).toList();
         }
 
     }
