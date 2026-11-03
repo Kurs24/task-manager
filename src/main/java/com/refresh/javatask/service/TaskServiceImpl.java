@@ -3,8 +3,10 @@ package com.refresh.javatask.service;
 import com.refresh.javatask.entity.Task;
 import com.refresh.javatask.exception.BusinessRuleException;
 import com.refresh.javatask.exception.ResourceNotFoundException;
+import com.refresh.javatask.mapper.TaskMapper;
 import com.refresh.javatask.repository.TaskRepository;
 import com.refresh.javatask.requestdto.TaskRequest;
+import com.refresh.javatask.responsedto.TaskResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,13 +24,13 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
-    public Task createTask(TaskRequest task) {
+    public TaskResponse createTask(TaskRequest task) {
         if (task.getDueDate() != null && task.getDueDate().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
             throw new BusinessRuleException("Due date cannot be in the past");
         }
         Task newTask = Task.builder().title(task.getTitle()).status(task.getStatus()).dueDate(task.getDueDate())
                 .description(task.getDescription()).build();
-        return taskRepository.save(newTask);
+        return TaskMapper.toTaskResponse(taskRepository.save(newTask));
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.refresh.javatask.controller;
 import com.refresh.javatask.entity.Task;
 import com.refresh.javatask.requestdto.TaskRequest;
 import com.refresh.javatask.responsedto.APIResponse;
+import com.refresh.javatask.responsedto.TaskResponse;
 import com.refresh.javatask.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -37,8 +38,8 @@ public class TaskController {
                     )
             }
     )
-    public ResponseEntity<APIResponse<Task>> createTask(@Valid @RequestBody TaskRequest request) {
-        Task created = taskService.createTask(request);
+    public ResponseEntity<APIResponse<TaskResponse>> createTask(@Valid @RequestBody TaskRequest request) {
+        TaskResponse created = taskService.createTask(request);
         URI location =
                 ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(created.getId()).toUri();
         return ResponseEntity.created(location)
