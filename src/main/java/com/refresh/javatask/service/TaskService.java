@@ -9,6 +9,6 @@ public interface TaskService {
     TaskResponse createTask(TaskRequest task);
     List<TaskResponse> findTasks(Task.Status status);
     TaskResponse findTaskById(Long id);
-    Task updateTask(TaskRequest task, Long id);
+    TaskResponse updateTask(TaskRequest task, Long id);
     void deleteTask(Long id);
 }

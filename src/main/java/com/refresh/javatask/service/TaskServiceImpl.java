@@ -51,14 +51,14 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
-    public Task updateTask(TaskRequest task, Long id) {
+    public TaskResponse updateTask(TaskRequest task, Long id) {
         Task existingTask = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task", id));
         existingTask.setTitle(task.getTitle());
         existingTask.setStatus(task.getStatus());
         existingTask.setDueDate(task.getDueDate());
         existingTask.setDescription(task.getDescription());
-        return taskRepository.save(existingTask);
+        return TaskMapper.toTaskResponse(taskRepository.save(existingTask));
     }
 
     @Override

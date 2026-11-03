@@ -98,13 +98,13 @@ public class TaskController {
                     )
             }
     )
-    public ResponseEntity<APIResponse<Task>> updateTask(@Valid @RequestBody TaskRequest request,
-                                                        @Parameter(
-                                                                description = "Id of the task",
-                                                                required = true,
-                                                                in = ParameterIn.PATH
-                                                        ) @PathVariable Long id) {
-        Task updated = taskService.updateTask(request, id);
+    public ResponseEntity<APIResponse<TaskResponse>> updateTask(@Valid @RequestBody TaskRequest request,
+                                                                @Parameter(
+                                                                        description = "Id of the task",
+                                                                        required = true,
+                                                                        in = ParameterIn.PATH
+                                                                ) @PathVariable Long id) {
+        TaskResponse updated = taskService.updateTask(request, id);
         return ResponseEntity.ok(APIResponse.of(updated, "Task successfully updated"));
     }
 
