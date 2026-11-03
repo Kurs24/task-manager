@@ -78,12 +78,12 @@ public class TaskController {
                     )
             }
     )
-    public ResponseEntity<APIResponse<Task>> getTaskById(@Parameter(
+    public ResponseEntity<APIResponse<TaskResponse>> getTaskById(@Parameter(
             description = "Id of the task",
             required = true,
             in = ParameterIn.PATH
     ) @PathVariable Long id) {
-        Task foundTask = taskService.findTaskById(id);
+        TaskResponse foundTask = taskService.findTaskById(id);
         return ResponseEntity.ok().body(APIResponse.of(foundTask, "Task successfully retrieved"));
     }
 
