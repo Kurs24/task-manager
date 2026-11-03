@@ -52,13 +52,20 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional
     public TaskResponse updateTask(TaskRequest task, Long id) {
+
         Task existingTask = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task", id));
+
+        if(task.getDueDate() != null && !task.getDueDate().equals(existingTask.getDueDate()) &&
+                    task.getDueDate().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
+                throw new BusinessRuleException("Due date cannot be in the past");
+            }
+
         existingTask.setTitle(task.getTitle());
         existingTask.setStatus(task.getStatus());
         existingTask.setDueDate(task.getDueDate());
         existingTask.setDescription(task.getDescription());
-        return TaskMapper.toTaskResponse(taskRepository.save(existingTask));
+        return TaskMapper.toTaskResponse(taskRepository.saveAndFlush(existingTask));
     }
 
     @Override
