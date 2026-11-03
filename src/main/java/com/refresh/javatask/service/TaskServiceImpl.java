@@ -3,14 +3,16 @@ package com.refresh.javatask.service;
 import com.refresh.javatask.entity.Task;
 import com.refresh.javatask.exception.BusinessRuleException;
 import com.refresh.javatask.exception.ResourceNotFoundException;
+import com.refresh.javatask.mapper.TaskMapper;
 import com.refresh.javatask.repository.TaskRepository;
 import com.refresh.javatask.requestdto.TaskRequest;
+import com.refresh.javatask.responsedto.TaskResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 
 @Service
@@ -19,43 +21,52 @@ import java.util.List;
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
+    private final Clock clock;
 
     @Override
     @Transactional
-    public Task createTask(TaskRequest task) {
-        if (task.getDueDate() != null && task.getDueDate().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
+    public TaskResponse createTask(TaskRequest task) {
+        if (task.getDueDate() != null && task.getDueDate().isBefore(LocalDateTime.now(clock))) {
             throw new BusinessRuleException("Due date cannot be in the past");
         }
         Task newTask = Task.builder().title(task.getTitle()).status(task.getStatus()).dueDate(task.getDueDate())
                 .description(task.getDescription()).build();
-        return taskRepository.save(newTask);
+        return TaskMapper.toTaskResponse(taskRepository.save(newTask));
     }
 
     @Override
-    public List<Task> findTasks(Task.Status status) {
+    public List<TaskResponse> findTasks(Task.Status status) {
         if (status == null) {
-            return taskRepository.findAll();
+            return taskRepository.findAll().stream().map(TaskMapper::toTaskResponse).toList();
         } else {
-            return taskRepository.findByStatus(status);
+            return taskRepository.findByStatus(status).stream().map(TaskMapper::toTaskResponse).toList();
         }
 
     }
 
     @Override
-    public Task findTaskById(Long id) {
-        return taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task", id));
+    public TaskResponse findTaskById(Long id) {
+        Task task = taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task", id));
+        return TaskMapper.toTaskResponse(task);
     }
 
     @Override
     @Transactional
-    public Task updateTask(TaskRequest task, Long id) {
+    public TaskResponse updateTask(TaskRequest task, Long id) {
+
         Task existingTask = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task", id));
+
+        if (task.getDueDate() != null && !task.getDueDate().equals(existingTask.getDueDate()) &&
+                task.getDueDate().isBefore(LocalDateTime.now(clock))) {
+            throw new BusinessRuleException("Due date cannot be in the past");
+        }
+
         existingTask.setTitle(task.getTitle());
         existingTask.setStatus(task.getStatus());
         existingTask.setDueDate(task.getDueDate());
         existingTask.setDescription(task.getDescription());
-        return taskRepository.save(existingTask);
+        return TaskMapper.toTaskResponse(taskRepository.saveAndFlush(existingTask));
     }
 
     @Override

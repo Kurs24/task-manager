@@ -3,6 +3,7 @@ package com.refresh.javatask.controller;
 import com.refresh.javatask.entity.Task;
 import com.refresh.javatask.requestdto.TaskRequest;
 import com.refresh.javatask.responsedto.APIResponse;
+import com.refresh.javatask.responsedto.TaskResponse;
 import com.refresh.javatask.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -37,8 +38,8 @@ public class TaskController {
                     )
             }
     )
-    public ResponseEntity<APIResponse<Task>> createTask(@Valid @RequestBody TaskRequest request) {
-        Task created = taskService.createTask(request);
+    public ResponseEntity<APIResponse<TaskResponse>> createTask(@Valid @RequestBody TaskRequest request) {
+        TaskResponse created = taskService.createTask(request);
         URI location =
                 ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(created.getId()).toUri();
         return ResponseEntity.created(location)
@@ -56,13 +57,13 @@ public class TaskController {
                     )
             }
     )
-    public ResponseEntity<APIResponse<List<Task>>> getTasks(
+    public ResponseEntity<APIResponse<List<TaskResponse>>> getTasks(
             @Parameter(
                     description = "Status of the task",
                     in = ParameterIn.QUERY
 
             ) @RequestParam(required = false) Task.Status status) {
-        List<Task> taskLists = taskService.findTasks(status);
+        List<TaskResponse> taskLists = taskService.findTasks(status);
         return ResponseEntity.ok().body(APIResponse.of(taskLists, "Tasks successfully retrieved"));
     }
 
@@ -77,12 +78,12 @@ public class TaskController {
                     )
             }
     )
-    public ResponseEntity<APIResponse<Task>> getTaskById(@Parameter(
+    public ResponseEntity<APIResponse<TaskResponse>> getTaskById(@Parameter(
             description = "Id of the task",
             required = true,
             in = ParameterIn.PATH
     ) @PathVariable Long id) {
-        Task foundTask = taskService.findTaskById(id);
+        TaskResponse foundTask = taskService.findTaskById(id);
         return ResponseEntity.ok().body(APIResponse.of(foundTask, "Task successfully retrieved"));
     }
 
@@ -97,13 +98,13 @@ public class TaskController {
                     )
             }
     )
-    public ResponseEntity<APIResponse<Task>> updateTask(@Valid @RequestBody TaskRequest request,
-                                                        @Parameter(
-                                                                description = "Id of the task",
-                                                                required = true,
-                                                                in = ParameterIn.PATH
-                                                        ) @PathVariable Long id) {
-        Task updated = taskService.updateTask(request, id);
+    public ResponseEntity<APIResponse<TaskResponse>> updateTask(@Valid @RequestBody TaskRequest request,
+                                                                @Parameter(
+                                                                        description = "Id of the task",
+                                                                        required = true,
+                                                                        in = ParameterIn.PATH
+                                                                ) @PathVariable Long id) {
+        TaskResponse updated = taskService.updateTask(request, id);
         return ResponseEntity.ok(APIResponse.of(updated, "Task successfully updated"));
     }
 
