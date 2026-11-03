@@ -57,10 +57,10 @@ public class TaskServiceImpl implements TaskService {
         Task existingTask = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task", id));
 
-        if(task.getDueDate() != null && !task.getDueDate().equals(existingTask.getDueDate()) &&
-                    task.getDueDate().isBefore(LocalDateTime.now(clock))) {
-                throw new BusinessRuleException("Due date cannot be in the past");
-            }
+        if (task.getDueDate() != null && !task.getDueDate().equals(existingTask.getDueDate()) &&
+                task.getDueDate().isBefore(LocalDateTime.now(clock))) {
+            throw new BusinessRuleException("Due date cannot be in the past");
+        }
 
         existingTask.setTitle(task.getTitle());
         existingTask.setStatus(task.getStatus());
