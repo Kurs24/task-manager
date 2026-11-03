@@ -18,12 +18,12 @@ public class TaskResponse {
     @Schema(description = "Description of the task", example = "Task Description")
     private String description;
 
-    @Schema(description = "Status of the task", example = "TODO")
+    @Schema(description = "Status of the task", example = "TODO", nullable = true)
     private Task.Status status;
 
     @Schema(description = "Last updated time of the task (UTC)", example = "2026-10-31T04:26:52.281")
     private LocalDateTime updatedAt;
 
-    @Schema(description = "Due date of the task (UTC)", example = "2030-10-31T04:26:52.281")
+    @Schema(description = "Due date of the task (UTC)", example = "2030-10-31T04:26:52.281", nullable = true)
     private LocalDateTime dueDate;
 }
