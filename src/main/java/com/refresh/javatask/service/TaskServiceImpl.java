@@ -11,8 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 
 @Service
@@ -21,11 +21,12 @@ import java.util.List;
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
+    private final Clock clock;
 
     @Override
     @Transactional
     public TaskResponse createTask(TaskRequest task) {
-        if (task.getDueDate() != null && task.getDueDate().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
+        if (task.getDueDate() != null && task.getDueDate().isBefore(LocalDateTime.now(clock))) {
             throw new BusinessRuleException("Due date cannot be in the past");
         }
         Task newTask = Task.builder().title(task.getTitle()).status(task.getStatus()).dueDate(task.getDueDate())
@@ -57,7 +58,7 @@ public class TaskServiceImpl implements TaskService {
                 .orElseThrow(() -> new ResourceNotFoundException("Task", id));
 
         if(task.getDueDate() != null && !task.getDueDate().equals(existingTask.getDueDate()) &&
-                    task.getDueDate().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
+                    task.getDueDate().isBefore(LocalDateTime.now(clock))) {
                 throw new BusinessRuleException("Due date cannot be in the past");
             }
 
