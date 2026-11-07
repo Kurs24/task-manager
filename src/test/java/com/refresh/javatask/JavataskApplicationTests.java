@@ -9,5 +9,4 @@ class JavataskApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }
