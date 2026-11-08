@@ -5,12 +5,15 @@ import com.refresh.javatask.exception.BusinessRuleException;
 import com.refresh.javatask.repository.TaskRepository;
 import com.refresh.javatask.requestdto.TaskRequest;
 import com.refresh.javatask.responsedto.TaskResponse;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -20,6 +23,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -88,6 +92,53 @@ public class TaskServiceImplTest {
         verify(taskRepository, never()).save(any());
     }
 
+    @Nested
+    @DisplayName("findTasks")
+    class FindTasks {
+
+        @ParameterizedTest(name = "status {0}: passed to repository, results mapped")
+        @EnumSource(Task.Status.class)
+        void givenStatus_delegatesToFindByStatus_andMapsResult(Task.Status status) {
+            // Given
+            Task task = taskFactory(1L, "Task 1", status, NOW.plusDays(1), "desc 1");
+            when(taskRepository.findByStatus(status)).thenReturn(List.of(task));
+
+            // When
+            List<TaskResponse> response = taskService.findTasks(status);
+
+            // Then
+            assertThat(response)
+                    .extracting(TaskResponse::getId, TaskResponse::getTitle, TaskResponse::getStatus,
+                            TaskResponse::getDueDate, TaskResponse::getDescription)
+                    .containsExactly(Tuple.tuple(1L, "Task 1", status, NOW.plusDays(1), "desc 1"));
+            verify(taskRepository).findByStatus(status);
+            verifyNoMoreInteractions(taskRepository);
+        }
+
+        @Test
+        @DisplayName("no tasks found for status: returns empty list")
+        void givenStatus_noTasksFound_returnsEmptyList() {
+            when(taskRepository.findByStatus(Task.Status.TODO)).thenReturn(List.of());
+
+            assertThat(taskService.findTasks(Task.Status.TODO)).isEmpty();
+            verifyNoMoreInteractions(taskRepository);
+        }
+
+        @Test
+        @DisplayName("null status: returns all tasks in repository order")
+        void nullStatus_returnsAllTasks() {
+            Task first = taskFactory(1L, "Task 1", Task.Status.TODO, NOW.plusDays(1), "desc 1");
+            Task second = taskFactory(2L, "Task 2", Task.Status.DONE, NOW.plusHours(1), "desc 2");
+            when(taskRepository.findAll()).thenReturn(List.of(first, second));
+
+            List<TaskResponse> response = taskService.findTasks(null);
+
+            assertThat(response).extracting(TaskResponse::getId).containsExactly(1L, 2L);
+            verifyNoMoreInteractions(taskRepository);
+        }
+    }
+
+
     static Stream<Arguments> validDueDates() {
         return Stream.of(
                 Arguments.of("due date in the future", NOW.plusDays(1)),
@@ -102,5 +153,10 @@ public class TaskServiceImplTest {
         request.setStatus(Task.Status.TODO);
         request.setDueDate(dueDate);
         return request;
+    }
+
+    private static Task taskFactory(Long id, String title, Task.Status status, LocalDateTime dueDate, String desc) {
+        return Task.builder().id(id).title(title).status(status).createdAt(NOW.minusDays(1))
+                .updatedAt(NOW.minusHours(2)).dueDate(dueDate).description(desc).build();
     }
 }
