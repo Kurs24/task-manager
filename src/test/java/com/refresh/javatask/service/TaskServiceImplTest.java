@@ -29,8 +29,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -175,6 +174,83 @@ public class TaskServiceImplTest {
                 .hasMessage("Task with id 1 not found");
         verify(taskRepository).findById(1L);
         verifyNoMoreInteractions(taskRepository);
+    }
+
+    @Nested
+    @DisplayName("updateTask")
+    class UpdateTask {
+
+        @Test
+        @DisplayName("updateTask: Id Not Found, should return Not Found Exception")
+        void updateTask_idNotFound_shouldThrowException() {
+            //Given
+            TaskRequest taskRequest = requestWithDueDate(NOW.plusDays(1));
+            when(taskRepository.findById(1L)).thenReturn(Optional.empty());
+
+            //When
+            assertThatThrownBy(() -> taskService.updateTask(taskRequest, 1L)).isInstanceOf(
+                    ResourceNotFoundException.class).hasMessage("Task with id 1 not found");
+            verify(taskRepository).findById(1L);
+            verifyNoMoreInteractions(taskRepository);
+        }
+
+        static Stream<Arguments> validUpdates() {
+            return Stream.of(
+                    // caseName, oldDueDate, oldDesc, newDueDate, newDesc
+                    Arguments.of("all fields replaced",
+                            NOW.plusDays(2), "old desc", NOW.plusDays(1), "new desc"),
+                    Arguments.of("optional fields not sent are cleared (PUT = full replace)",
+                            NOW.plusDays(2), "old desc", null, null),
+                    Arguments.of("optional fields set on a task that had none",
+                            null, null, NOW.plusDays(1), "new desc"),
+                    Arguments.of("unchanged past due date is allowed",
+                            NOW.minusDays(1), "old desc", NOW.minusDays(1), "new desc"),
+                    Arguments.of("due date changed to exactly now (boundary)",
+                            NOW.plusDays(2), "old desc", NOW, "new desc"));
+        }
+
+        @ParameterizedTest(name = "[{index}] {0}")
+        @MethodSource("validUpdates")
+        void updateTask_validRequest_replacesAllFields(String caseName,
+                                                       LocalDateTime oldDueDate, String oldDesc,
+                                                       LocalDateTime newDueDate, String newDesc) {
+            // Given
+            Task existing = taskFactory(1L, "old title", Task.Status.IN_PROGRESS, oldDueDate, oldDesc);
+            TaskRequest request = requestWithDueDate(newDueDate);
+            request.setTitle("new title");
+            request.setStatus(Task.Status.DONE);
+            request.setDescription(newDesc);
+            when(taskRepository.findById(1L)).thenReturn(Optional.of(existing));
+            when(taskRepository.saveAndFlush(existing)).thenAnswer(inv -> inv.getArgument(0));
+
+            // When
+            TaskResponse response = taskService.updateTask(request, 1L);
+
+            // Then
+            assertThat(response)
+                    .extracting(TaskResponse::getId, TaskResponse::getTitle, TaskResponse::getStatus,
+                            TaskResponse::getDueDate, TaskResponse::getDescription)
+                    .containsExactly(1L, "new title", Task.Status.DONE, newDueDate, newDesc);
+            verify(taskRepository).findById(1L);
+            verify(taskRepository).saveAndFlush(existing);
+            verifyNoMoreInteractions(taskRepository);
+        }
+
+        @Test
+        @DisplayName("updateTask: due date is in the past")
+        void updateTask_dueDateNotValid_throwError() {
+            //Given
+            Task taskFound = taskFactory(1L, "task 1", Task.Status.IN_PROGRESS, NOW.plusDays(1), "desc 1");
+            TaskRequest taskRequest = requestWithDueDate(NOW.minusDays(1));
+            when(taskRepository.findById(1L)).thenReturn(Optional.of(taskFound));
+
+            //When
+            assertThatThrownBy(() -> taskService.updateTask(taskRequest, 1L)).isInstanceOf(BusinessRuleException.class)
+                    .hasMessage("Due date cannot be in the past");
+            verify(taskRepository).findById(1L);
+            verifyNoMoreInteractions(taskRepository);
+            assertThat(taskFound.getTitle()).isEqualTo("task 1");
+        }
     }
 
     static Stream<Arguments> validDueDates() {
