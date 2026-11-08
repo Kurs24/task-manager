@@ -2,6 +2,8 @@ package com.refresh.javatask.service;
 
 import com.refresh.javatask.entity.Task;
 import com.refresh.javatask.exception.BusinessRuleException;
+import com.refresh.javatask.exception.ResourceNotFoundException;
+import com.refresh.javatask.mapper.TaskMapper;
 import com.refresh.javatask.repository.TaskRepository;
 import com.refresh.javatask.requestdto.TaskRequest;
 import com.refresh.javatask.responsedto.TaskResponse;
@@ -24,6 +26,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -84,8 +87,7 @@ public class TaskServiceImplTest {
         request.setDueDate(NOW.minusSeconds(1));
 
         //When
-        assertThatThrownBy(() -> taskService.createTask(request))
-                .isInstanceOf(BusinessRuleException.class)
+        assertThatThrownBy(() -> taskService.createTask(request)).isInstanceOf(BusinessRuleException.class)
                 .hasMessage("Due date cannot be in the past");
 
         //Then
@@ -107,8 +109,7 @@ public class TaskServiceImplTest {
             List<TaskResponse> response = taskService.findTasks(status);
 
             // Then
-            assertThat(response)
-                    .extracting(TaskResponse::getId, TaskResponse::getTitle, TaskResponse::getStatus,
+            assertThat(response).extracting(TaskResponse::getId, TaskResponse::getTitle, TaskResponse::getStatus,
                             TaskResponse::getDueDate, TaskResponse::getDescription)
                     .containsExactly(Tuple.tuple(1L, "Task 1", status, NOW.plusDays(1), "desc 1"));
             verify(taskRepository).findByStatus(status);
@@ -118,8 +119,10 @@ public class TaskServiceImplTest {
         @Test
         @DisplayName("no tasks found for status: returns empty list")
         void givenStatus_noTasksFound_returnsEmptyList() {
+            //Given
             when(taskRepository.findByStatus(Task.Status.TODO)).thenReturn(List.of());
 
+            //Then
             assertThat(taskService.findTasks(Task.Status.TODO)).isEmpty();
             verifyNoMoreInteractions(taskRepository);
         }
@@ -127,23 +130,56 @@ public class TaskServiceImplTest {
         @Test
         @DisplayName("null status: returns all tasks in repository order")
         void nullStatus_returnsAllTasks() {
+            //Given
             Task first = taskFactory(1L, "Task 1", Task.Status.TODO, NOW.plusDays(1), "desc 1");
             Task second = taskFactory(2L, "Task 2", Task.Status.DONE, NOW.plusHours(1), "desc 2");
             when(taskRepository.findAll()).thenReturn(List.of(first, second));
 
+            //When
             List<TaskResponse> response = taskService.findTasks(null);
 
+            //Then
             assertThat(response).extracting(TaskResponse::getId).containsExactly(1L, 2L);
             verifyNoMoreInteractions(taskRepository);
         }
     }
 
+    @Test
+    @DisplayName("findTaskById: id found, task returned")
+    void findTaskById_idFound_taskReturned() {
+        //Given
+        Task taskFound = taskFactory(1L, "task 1", Task.Status.IN_PROGRESS, NOW.plusDays(1), "desc 1");
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(taskFound));
+
+        //When
+        TaskResponse response = taskService.findTaskById(1L);
+
+        //Then
+        verify(taskRepository).findById(1L);
+        assertThat(response).isEqualTo(TaskMapper.toTaskResponse(taskFound));
+        assertThat(response.getId()).isEqualTo(1L);
+        assertThat(response.getStatus()).isEqualTo(Task.Status.IN_PROGRESS);
+        assertThat(response.getTitle()).isEqualTo("task 1");
+        assertThat(response.getDescription()).isEqualTo("desc 1");
+        assertThat(response.getDueDate()).isEqualTo(NOW.plusDays(1));
+    }
+
+    @Test
+    @DisplayName("findTaskBydId: id not found, throw error")
+    void findTaskById_idNotFound_throwError() {
+        //Given
+        when(taskRepository.findById(1L)).thenReturn(Optional.empty());
+
+        //When
+        assertThatThrownBy(() -> taskService.findTaskById(1L)).isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Task with id 1 not found");
+        verify(taskRepository).findById(1L);
+        verifyNoMoreInteractions(taskRepository);
+    }
 
     static Stream<Arguments> validDueDates() {
-        return Stream.of(
-                Arguments.of("due date in the future", NOW.plusDays(1)),
-                Arguments.of("no due date (null)", null),
-                Arguments.of("due date equals now (boundary)", NOW));
+        return Stream.of(Arguments.of("due date in the future", NOW.plusDays(1)),
+                Arguments.of("no due date (null)", null), Arguments.of("due date equals now (boundary)", NOW));
     }
 
     private static TaskRequest requestWithDueDate(LocalDateTime dueDate) {
