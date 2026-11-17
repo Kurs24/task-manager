@@ -54,8 +54,7 @@ public class TaskServiceImpl implements TaskService {
     @Transactional
     public TaskResponse updateTask(TaskRequest task, Long id) {
 
-        Task existingTask = taskRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Task", id));
+        Task existingTask = taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task", id));
 
         if (task.getDueDate() != null && !task.getDueDate().equals(existingTask.getDueDate()) &&
                 task.getDueDate().isBefore(LocalDateTime.now(clock))) {

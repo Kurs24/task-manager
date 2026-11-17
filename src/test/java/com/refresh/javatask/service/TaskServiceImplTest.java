@@ -253,6 +253,33 @@ public class TaskServiceImplTest {
         }
     }
 
+    @Test
+    @DisplayName("deleteTask: task not found throw error")
+    void deleteTask_taskNotFound_throwError() {
+        //Given
+        when(taskRepository.existsById(1L)).thenReturn(false);
+
+        //When
+        assertThatThrownBy(() -> taskService.deleteTask(1L)).isInstanceOf(
+                ResourceNotFoundException.class).hasMessage("Task with id 1 not found");
+        verify(taskRepository).existsById(1L);
+        verifyNoMoreInteractions(taskRepository);
+    }
+
+    @Test
+    @DisplayName("deleteTask: task found and successfully deleted")
+    void deleteTask_taskFound_deleteSuccess() {
+        //Given
+        when(taskRepository.existsById(1L)).thenReturn(true);
+
+        //When
+        taskService.deleteTask(1L);
+
+        //Then
+        verify(taskRepository).existsById(1L);
+        verify(taskRepository).deleteById(1L);
+    }
+
     static Stream<Arguments> validDueDates() {
         return Stream.of(Arguments.of("due date in the future", NOW.plusDays(1)),
                 Arguments.of("no due date (null)", null), Arguments.of("due date equals now (boundary)", NOW));
