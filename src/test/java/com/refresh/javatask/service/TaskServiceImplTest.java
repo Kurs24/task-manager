@@ -3,7 +3,6 @@ package com.refresh.javatask.service;
 import com.refresh.javatask.entity.Task;
 import com.refresh.javatask.exception.BusinessRuleException;
 import com.refresh.javatask.exception.ResourceNotFoundException;
-import com.refresh.javatask.mapper.TaskMapper;
 import com.refresh.javatask.repository.TaskRepository;
 import com.refresh.javatask.requestdto.TaskRequest;
 import com.refresh.javatask.responsedto.TaskResponse;
@@ -29,7 +28,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -155,7 +155,6 @@ public class TaskServiceImplTest {
 
         //Then
         verify(taskRepository).findById(1L);
-        assertThat(response).isEqualTo(TaskMapper.toTaskResponse(taskFound));
         assertThat(response.getId()).isEqualTo(1L);
         assertThat(response.getStatus()).isEqualTo(Task.Status.IN_PROGRESS);
         assertThat(response.getTitle()).isEqualTo("task 1");
@@ -228,9 +227,11 @@ public class TaskServiceImplTest {
 
             // Then
             assertThat(response)
-                    .extracting(TaskResponse::getId, TaskResponse::getTitle, TaskResponse::getStatus,
-                            TaskResponse::getDueDate, TaskResponse::getDescription)
-                    .containsExactly(1L, "new title", Task.Status.DONE, newDueDate, newDesc);
+                    .returns(1L, TaskResponse::getId)
+                    .returns("new title", TaskResponse::getTitle)
+                    .returns(Task.Status.DONE, TaskResponse::getStatus)
+                    .returns(newDueDate, TaskResponse::getDueDate)
+                    .returns(newDesc, TaskResponse::getDescription);
             verify(taskRepository).findById(1L);
             verify(taskRepository).saveAndFlush(existing);
             verifyNoMoreInteractions(taskRepository);
@@ -278,6 +279,7 @@ public class TaskServiceImplTest {
         //Then
         verify(taskRepository).existsById(1L);
         verify(taskRepository).deleteById(1L);
+        verifyNoMoreInteractions(taskRepository);
     }
 
     static Stream<Arguments> validDueDates() {
